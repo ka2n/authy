@@ -12,8 +12,8 @@ import (
 
 // Searcher
 type Searcher struct {
-	isAlfred bool
-	keyword  string
+	OutputMode string
+	keyword    string
 	*Device
 }
 
@@ -22,11 +22,11 @@ func (s *Searcher) showAll() bool {
 }
 
 // NewSearcher ..
-func NewSearcher(keyword string, isAlfred bool) *Searcher {
+func NewSearcher(keyword string, mode string) *Searcher {
 	return &Searcher{
-		isAlfred: isAlfred,
-		keyword:  keyword,
-		Device:   NewDevice(NewDeviceConfig{}),
+		OutputMode: mode,
+		keyword:    keyword,
+		Device:     NewDevice(NewDeviceConfig{}),
 	}
 }
 

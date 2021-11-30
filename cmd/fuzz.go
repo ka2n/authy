@@ -17,25 +17,30 @@ var fuzzCmd = &cobra.Command{
 First time(or after clean cache) , need your authy main password`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var (
-			isAlfred = false
-			keyword  = ""
+			mode    = ""
+			keyword = ""
 		)
 		if alfredCount != nil && *alfredCount > 0 {
-			isAlfred = true
+			mode = "alfred"
+		}
+		if shellCount != nil && *shellCount > 0 {
+			mode = "shell"
 		}
 
 		if len(args) > 0 {
 			keyword = args[0]
 		}
 
-		service.NewSearcher(keyword, isAlfred).Search()
+		service.NewSearcher(keyword, mode).Search()
 
 	},
 }
 
 var alfredCount *int
+var shellCount *int
 
 func init() {
 	rootCmd.AddCommand(fuzzCmd)
 	alfredCount = fuzzCmd.Flags().CountP("alfred", "a", "Specify Output Mode AlfredWorkflow")
+	shellCount = fuzzCmd.Flags().CountP("shell", "s", "Specify Output Mode Shell")
 }

@@ -1,8 +1,10 @@
 package service
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"os"
 )
 
 // AlfredOutput ..
@@ -59,12 +61,19 @@ func (o Output) ToAfred() AlfredOutput {
 }
 
 func (s *Searcher) showResult(outputs []Output) {
-	if s.isAlfred {
+	switch s.OutputMode {
+	case "alfred":
 		s.showAlfredOutput(outputs)
 		return
+	case "shell":
+		s.showShellOutput(outputs)
+		return
+	case "pritty":
+		fallthrough
+	default:
+		s.prettyPrintResult(outputs)
 	}
 
-	s.prettyPrintResult(outputs)
 }
 
 func (s *Searcher) showAlfredOutput(out []Output) {
@@ -76,6 +85,29 @@ func (s *Searcher) showAlfredOutput(out []Output) {
 	m := map[string][]AlfredOutput{"items": alfredOut}
 	b, _ := json.Marshal(m)
 	fmt.Println(string(b))
+}
+
+func (s *Searcher) showShellOutput(out []Output) {
+	writer := csv.NewWriter(os.Stdout)
+	writer.Comma = '\t'
+	defer writer.Flush()
+	for _, tk := range out {
+		if tk.Error == nil {
+			writer.Write([]string{
+				tk.Title(),
+				tk.Code,
+				fmt.Sprint(tk.RemainSecs),
+				"",
+			})
+		} else {
+			writer.Write([]string{
+				tk.Title(),
+				"",
+				"",
+				fmt.Sprintf("%v", tk.Error),
+			})
+		}
+	}
 }
 
 const (
